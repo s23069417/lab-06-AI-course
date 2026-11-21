@@ -1,13 +1,7 @@
 # REPORT — what the measurement showed, who it affects, and whose responsibility it is
 
-The guiding questions are prompts, not a form: you do not have to answer each one in turn, and
-answering them without evidence from your run earns nothing.
 
 ## 1. Measurement read-out
-
-(Dimension: Evidence of Specific Impact.)
-
-Guiding questions:
 
 I ran 40 matched pairs for each of five groups (name language, gender-coded name, university, and the two floors null_name and null_university): 200 pairs, 400 profiles, 400 model calls, with Qwen2.5-3B-Instruct under greedy decoding. 356 of 400 profiles were shortlisted. 0 of 400 replies were unparseable.
 
@@ -48,7 +42,6 @@ All three intervals overlap their floors. The signed score gaps, first group min
 
 ## 2. Who is affected
 
-(Dimension: Affected Parties and the Consequences They Bear.)
 
 **Wrongly rejected.** The only directional pattern I measured was against male-coded names (4 flips, 0 the other way; 80.0% shortlisted vs 90.0% for female-coded) and in favour of flagship universities (+2.5 score points; 92.5% vs 90.0% shortlisted). Neither flip count is above its floor, so I cannot say these groups are harmed. I can say that if there is an undetected effect of the size my sample could miss, it would fall on male-coded applicants and on applicants from regional universities. Separately, and regardless of attribute, anyone whose profile is formatted differently is exposed to the 25.0% order-probe divergence. A person wrongly rejected loses a place and possibly funding. The model returns a one-sentence reason, but my run does not show whether the applicant ever sees it.
 
@@ -69,7 +62,6 @@ All three intervals overlap their floors. The signed score gaps, first group min
 
 ## 3. Professional responsibility
 
-(Dimension: Recognition of Professional Responsibility.)
 **What I must check before it runs.**
 
 - Test sensitivity to layout, not only to protected attributes. My floors missed what the order probe found (25.0%).
@@ -97,4 +89,5 @@ All three intervals overlap their floors. The signed score gaps, first group min
 | appeals | not built | institution to define |
 
 **What belongs to the institution.** The institution sets the purpose of the system, how many places there are, who reviews escalated cases and how they are trained, the appeals route for rejected and refused applicants, and the retention rules for the log. I cannot set these from inside the harness.
+
 **Where the two conflict.** Suppose the institution asks me to remove refusals or escalation to save reviewer time or cost. I measured what the refusal path prevents: without it, the bare pipeline screened all six requests, including one that serves a purpose the system must not serve. Escalation sends 8.5% of applicants to a person at no extra model cost (400 calls in both runs; 485.2 s harness vs 494.9 s bare), and its price is reviewer workload. The counterfactual check would double the model calls (32 calls for 16 profiles in my extension). It caused no escalation there (both escalations were borderline), but 8 pairs are too few to say whether it would catch anything, so I cannot use that run to argue the control is unnecessary. My responsibility is to document what each control prevents, to say what my evidence does not show, and to not remove a control silently or to describe the system as validated once it is removed. If the institution still removes it, that decision and its owner must be written down.
