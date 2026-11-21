@@ -1,11 +1,5 @@
 # REPORT — what the measurement showed, who it affects, and whose responsibility it is
 
-Replace this whole template with your own text. Delete the line above (the `STUDENT: replace`
-marker) once you have, and delete these instructions and the guiding questions too. Keep the three
-numbered headings. Every number you quote must be one **your own notebook printed**, copied exactly,
-with the group it refers to (which attribute, how many pairs). Which dimension each section is
-graded against is in the README.
-
 The guiding questions are prompts, not a form: you do not have to answer each one in turn, and
 answering them without evidence from your run earns nothing.
 
