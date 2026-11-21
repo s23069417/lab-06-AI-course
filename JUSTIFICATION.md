@@ -52,6 +52,9 @@ The guiding questions are prompts, not a form.
 
 ## 4. The legal constraints
 
+Before the search:
+Prediction: I think validate_input will be the hardest control to tie to a specific provision. It is a sanity check: is the GPA a number between 0 and 4, is the age an integer, is consent a real boolean. This looks like engineering hygiene rather than a regulated activity. I expect a data-protection law to say at most that data must be accurate or kept secure, and I do not expect any article to say "check that GPA is a float". So I expect to find only a general clause on accuracy or integrity of processing. That said, validate_input does more than check types: it refuses to make a decision on impossible values, so it keeps the system from deciding on garbage data. If the clause I find does not bind this prototype, I will mark it in the register as a benchmark.
+
 (Dimension: Identification and Citation of Legal Constraints.)
 
 - Which instruments apply to an automated screening decision about people, and why do they
