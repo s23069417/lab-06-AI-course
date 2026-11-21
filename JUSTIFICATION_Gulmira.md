@@ -1,9 +1,5 @@
 # JUSTIFICATION — the design of the harness, and why
 
-Replace this whole template with your own text. Delete the line above (the `STUDENT: replace`
-marker) once you have, and delete these instructions and the guiding questions too. Keep the headings
-that follow. Which dimension each section is graded against is in the README.
-
 Two rules for the whole document:
 
 - **Every claim about a law needs a citation to the instrument and the provision** it rests on,
