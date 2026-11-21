@@ -1,19 +1,6 @@
 # JUSTIFICATION — the design of the harness, and why
 
-Two rules for the whole document:
-
-- **Every claim about a law needs a citation to the instrument and the provision** it rests on,
-  written so a reader can find the text. You identify the instruments yourself, from the primary text.
-  A chat model's statement is not a citation.
-- **Everything you describe must be in the code or in the submitted run.** A control you describe
-  but did not build, or a refusal you state but never triggered, belongs under "what the design still
-  fails to protect against".
-
-The guiding questions are prompts, not a form.
-
 ## 1. What the system may do
-
-(Dimension: Integration of Constraints into the Design.)
 
 **Purpose.** The system screens applications for the Tulpar Scholarship Fund. It reads one applicant profile and answers *shortlist* or *reject* with a score from 0 to 100 (this is the system prompt of the supplied agent). It does nothing else. In my harness run of 400 profiles the model alone decided 366 of them (342 shortlist, 24 reject). 34 profiles (8.5%) went to a person, and none were refused, because the measured applicants are clean. A person looks only at the escalated cases. Nobody re-checks the other 366 (see section 6).
 
@@ -34,7 +21,6 @@ The guiding questions are prompts, not a form.
 
 ## 2. What it must refuse
 
-(Dimension: Refusal Boundaries and Enforcement.)
 
 | request | reason code | enforced by | fired in my run |
 |---|---|---|---|
@@ -58,7 +44,6 @@ The harness refused 5 of the 6 requests (the sixth was an ordinary application, 
 
 ## 3. What record it keeps
 
-(Dimension: Accountability Record and Auditability.)
 
 **Audit question:** "Why did this application get this outcome, and could someone else reconstruct it without re-running the model?"
 
@@ -76,7 +61,6 @@ The harness refused 5 of the 6 requests (the sixth was an ordinary application, 
 **Before the search:**
 Prediction: I think validate_input will be the hardest control to tie to a specific provision. It is a sanity check: is the GPA a number between 0 and 4, is the age an integer, is consent a real boolean. This looks like engineering hygiene rather than a regulated activity. I expect a data-protection law to say at most that data must be accurate or kept secure, and I do not expect any article to say "check that GPA is a float". So I expect to find only a general clause on accuracy or integrity of processing. That said, validate_input does more than check types: it refuses to make a decision on impossible values, so it keeps the system from deciding on garbage data. If the clause I find does not bind this prototype, I will mark it in the register as a benchmark.
 
-(Dimension: Identification and Citation of Legal Constraints.)
 
 **After the search, the prediction was mostly right.** I read the primary text of both laws. No article requires input validation. I expected to find an accuracy principle in the personal data law, but its Art. 5 lists only legality, constitutional rights, confidentiality, equality of rights and security. The closest text is in the AI law: Art. 11(1) (systems must be safe and reliable, excluding unforeseen consequences) and Art. 15(2)(2) (the owner protects the system from failures). So `validate_input` is tied to a general reliability clause, and I mark it as a benchmark.
 
@@ -97,7 +81,6 @@ I read the AI law as amended on 25 August 2026 (Law No. 326-VIII of 24 June 2026
 
 ## 5. The ethical principles
 
-(Dimension: Identification of Applicable Ethical Principles.)
 
 I took the principles from two sources. First, Art. 4 of the AI law lists seven principles of state regulation (legality; fairness and equality; transparency and explainability; responsibility and controllability; priority of human well-being and free will; data protection and confidentiality; safety and security). This is a binding statute, but it states principles for regulation, not for my fund. Second, the UNESCO Recommendation on the Ethics of Artificial Intelligence (2021), section III.2 "Principles". It is a recommendation of the UNESCO General Conference: it is not a treaty and creates no binding obligation.
 
@@ -121,30 +104,29 @@ I took the principles from two sources. First, Art. 4 of the AI law lists seven 
 
 ## 6. The trade-offs
 
-(Dimension: Trade-off Analysis and Justification.)
 
 **Cost of each control, using my before-and-after numbers.**
 
 | control | cost | harm it prevents |
 |---|---|---|
-| `blind` | 166 of 400 scores changed (mean 14.01); 46 of 400 outcomes changed (reject → escalate 22, shortlist → escalate 12, shortlist → reject 7, reject → shortlist 5); 0 extra model calls (400 vs 400); time 485.2 s vs 494.9 s for the bare run | the model reading name and university; the +2.5 point university gap is gone because the model no longer sees the university |
+| `blind` | 12 of 400 profiles moved between shortlist and reject after name and university were removed (7 shortlist → reject, 5 reject → shortlist); 166 of 400 scores changed (mean 14.01); 0 extra model calls (400 vs 400); time 485.2 s vs 494.9 s for the bare run. These changes may come from the shorter prompt and not from the removed fields | the model reading name and university; the +2.5 point university gap is gone because the model no longer sees the university |
 | `validate_input` | 1 refusal in Part 4, 0 of 400 clean applicants refused | a decision on impossible values (the bare pipeline returned reject for GPA 9.9) |
 | `refuse` | applicants who are refused get no decision; 0 of 400 clean applicants refused, but a weak test | five requests that should not be screened; they used 0 model calls |
 | `log` | 406 records; stores field names only; I did not measure its cost separately | decisions that nobody can reconstruct |
-| `escalate` | 34 of 400 profiles (8.5%) for a reviewer to read | uncertain calls decided by the model alone (the 40-49 bucket had 33 rejects and 31 shortlists) |
+| `escalate` | 34 of 400 profiles (8.5%) for a reviewer to read (22 reject → escalate, 12 shortlist → escalate; measured against the bare run, so they may include score shifts from the shorter prompt); 46 of 400 outcomes changed in total for the whole harness | uncertain calls decided by the model alone (the 40-49 bucket had 33 rejects and 31 shortlists) |
 
 **The escalation band.** I planned that (40, 49) would send 64 of 400 baseline profiles (16.0%) to a person. In the harness run 34 of 400 (8.5%) went. It is lower because I chose the band on the scores of the unblinded model, and the scores moved by 14 points on average when the prompt got shorter. I did not recalibrate the band after blinding: it is still (40, 49). So what the band means has changed, and I should recalibrate it on the harness scores. The code does not say who reads the 34 cases or how fast. Outside the band, 366 decisions (342 shortlist, 24 reject) are never re-checked. My own escalation rule (reason mentions a protected attribute, decision does not fit the score, strong applicant rejected) could catch some of them, but in my run it fired 0 times: all 34 escalations have the reason code `borderline`.
 
-**Why this balance, and what would change it.** I kept the harness cheap: no extra model calls, and the controls are ordinary code. If reviewers could read more, I would widen the band. If a larger run (more than 40 pairs per attribute) put an attribute clearly above its floor, I would hold name and university back and look at the proxy fields too. With n=40 I could only see an effect if at least 6 pairs flipped in one direction and none in the other, and my largest count was 4, so a small effect could have been missed. Also the agent shortlisted 356 of 400 (89%), so there was little room for flips.
+**Why this balance, and what would change it.** I kept the harness cheap: no extra model calls, and the controls are ordinary code. If reviewers could read more, I would widen the band. If a larger run (more than 40 pairs per attribute) put an attribute clearly above its floor, I would keep name and university hidden and look at the proxy fields too. With n=40 I could only see an effect if at least 6 pairs flipped in one direction and none in the other, and my largest count was 4, so a small effect could have been missed. Also the agent shortlisted 356 of 400 (89%), so there was little room for flips.
 
 **What the design still fails to protect against.**
 - Proxy fields (`program`, `age`, `household_income_bracket`) are still shown and were never tested.
 - Part 1 is small and synthetic: 40 pairs per attribute, one model, greedy decoding, one prompt version. "No effect found" is not proof of no bias.
 - Applicants are not informed and have no objection channel, and refused applicants have no way to ask for a person (PD Law Art. 19-1(2)-(3); AI Law Art. 7(2)). Closing this needs a notice and a reviewer queue, which I did not build.
 - The log has no retention period, no access control and nothing that stops edits, and it does not record the human reviewer's decision.
-- My refusal rule is a word list on `name` and `university` only. It can refuse honest applicants, and it does not check other free-text fields such as `program`.
+- My refusal rule is a word list on name and university plus a name-shape check and it does not check other free-text fields such as program.
 - 366 decisions outside the band are not reviewed by anyone.
-- I did not run the counterfactual check or the order-sensitivity probe, so I do not know how much of what I measured is sensitivity to prompt format.
+- I ran the order-sensitivity probe (10 flips in 40 pairs of identical applicants = 25.0% [14.2%, 40.2%], all in one direction, p=0.002) and a counterfactual check on 8 name-language pairs (16 profiles, 32 model calls; 14 shortlist, 2 escalate, both for the borderline band). I did not build a control against layout sensitivity, and 8 pairs are too few to judge the counterfactual check, so the layout dependence of the agent is still unprotected.
 
 I did not close these gaps because the lab is a prototype on invented data and the time was limited, but each of them would have to be closed before a real fund used this system.
 
